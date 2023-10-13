@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="./css/index.css">
+   <title>Document</title>
+</head>
+<body>
+    
+<div class="container">
+   <div class="wrapper">
+      <form  class="form">
+         <input type="text" name="name" placeholder="name" id="name">
+         <input type="text" name="message" placeholder="message" id="message">
+         <input type="submit" value="Send" id="send">
+      </form>
+      <div class="chat" id="chat">
+         <!-- <p class="chat-message"></p> -->
+         
+      </div>
+   </div>
+</div>
+
+   <script type="module">
+      const inpName = document.getElementById('name');
+      const inpMessage = document.getElementById('message');
+      const chat = document.getElementById('chat')
+      const form = document.querySelector('.form')
+      
+      // const inp = document.getElementById('');
+
+      const ws = new WebSocket('ws://127.0.0.1.:8000')
+      ws.onmessage = (message) => {
+         const messages = JSON.parse(message.data)
+         messages.forEach(item => {
+            const messageNode = document.createElement('div')
+            messageNode.classList.add('chat-message')
+            messageNode.innerHTML = `<span>${item.name}</span><br><p>${item.message}</p>`
+            chat.appendChild(messageNode)
+         });
+         console.log(JSON.parse(message.data));
+      }
+      const send = (event) => {
+         event.preventDefault()
+         const name = inpName.value
+         const message = inpMessage.value
+         ws.send(JSON.stringify({
+            name, message
+         }))
+         form.reset()
+         return false
+      }
+
+      form.addEventListener('submit', send)
+
+   </script>
+</body>
+</html>
